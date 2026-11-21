@@ -6,15 +6,21 @@ rate at the case's target. Standard library only, no network, deterministic.
 
 The idea in one paragraph
 -------------------------
-Exophase shows, for each trophy, the share of the players it tracks whose
-profile held the trophy *the last time Exophase scanned that profile*. Early in
-a launch most tracked profiles were scanned once, minutes after their first
-trophy, so the page lags real progress badly: about 40 hours after launch it
-showed 1.38 trophies per tracked player while freshly synced profiles on another
-tracker averaged about six. Mature Exophase pages of comparable games (a month
-after launch) show first-chapter trophies at 55-90 % and story endings near
-30 %. So the week-one question is not "do rates drift" but "how far does the
-page catch up", and persistence is a poor median for almost every trophy.
+Exophase shows, for each trophy, the share of the players it tracks who hold
+it. Two days after launch the page is early in a long game: 18 % of 54,144
+tracked players had finished Chapter 1, 3.6 % Chapter 2 and only a few dozen
+early-copy players anything later, and a second tracker with 91,204 owners
+showed the same picture within a point. So the page is not badly behind real
+play; players simply have a weekend and three more days of playing ahead of
+them, and persistence is a poor median for almost every trophy.
+
+The story trophies turn out to follow one curve at different speeds. Chapter 2
+stood at 1.71 % and 3.61 % at 39.6 h and 50.2 h after launch and climbed as
+steeply (in logit against log time) as Chapter 1 would have at half those
+hours, and "Trust" tracks Chapter 1 at about 1/1.5 of the clock. Reading
+rate_k(t) = rate_1(t / c_k) puts Chapter 1 a little under 50 % a week in,
+Chapter 2 over a quarter, and the long third chapter (c about 6) near 5 %; side trophies that
+are earned inside story missions keep their ratio to the chapter they sit in.
 
 Three views of each trophy's rate at the target are blended on the logit scale:
 
@@ -48,8 +54,9 @@ Z_SCORES = (-1.645, -0.674, 0.0, 0.674, 1.645)
 LAUNCH = datetime(2026, 11, 19, 0, 0, 0, tzinfo=timezone.utc)
 
 # Hours after LAUNCH of the read the SNAP column below was taken at
-# (2026-11-20 about 15:35 UTC, 44,161 players tracked, 60,923 trophies earned).
-SNAP_HOURS = 39.6
+# (2026-11-21 about 02:10 UTC, 54,144 players tracked, 85,479 trophies earned;
+# the read before it, 39.6 h after launch, had 44,161 and 60,923).
+SNAP_HOURS = 50.2
 # Hours after LAUNCH the PRIOR column speaks about (2026-11-26 00:00 UTC).
 PRIOR_HOURS = 168.0
 
@@ -83,85 +90,88 @@ EARLY_PLAYERS = 2000
 EARLY_SHIFT = -1.45
 EARLY_SIGMA = 0.5
 
-# name key -> (SNAP: rate on the page 39.6 h after launch,
+# name key -> (SNAP: rate on the page 50.2 h after launch,
 #              PRIOR: median displayed rate 168 h after launch,
 #              SIGMA: logit-scale uncertainty of that prior)
 #
-# How the priors were reasoned. At the snapshot, 12 % of tracked players showed
-# Chapter 1 and 1.7 % Chapter 2, with the page far behind real play. By day 7
-# the weekend has passed and a good share of profiles has been rescanned at
-# least once, but new and never-rescanned players still drag every rate down.
-# Archived Exophase pages of earlier launches back this up: one platformer's
-# page went from 474 tracked players a day and a half after launch to 26,849
-# four weeks later while its easiest progress trophy rose from 45 % to 92 %
-# (about +2.7 logits), so most of the players on a day-7 page are first scanned
-# days into their playthrough. I take the displayed rate to reach roughly half
-# of real progress: Chapter 1 about 45 %, falling along the story to about
-# 1.6 % for the final mission of a long game. Reviewer accounts (4 platinums, about 9 story completions) put a
-# floor of 0.01-0.03 % under many trophies at the snapshot; that floor dilutes
-# to nothing as tracked players grow, so late-story and grind trophies are
-# priced from real play alone. Optional feats that fall out of ordinary play
-# (vehicles discovered, a first arcade game, bowling) grow with hours played;
-# completion grinds (250 stunts, 100 photo spots, 100 %) stay on the floor.
+# How the priors were reasoned. Chapter 1's own curve, pieced together from its
+# two reads and from Chapter 2 read at twice the clock, runs about 1.7 % at
+# 20 h, 3.6 % at 25 h, 12 % at 40 h and 18 % at 50 h, its slope in logit against
+# log time falling from 3.3 to 2.0 on the way. Carried on with a slope that
+# keeps falling, it is near 32 % at 84 h and 48 % at 168 h; the weekend argues
+# for a little more and late joiners for a little less. Every story trophy is
+# then read off that curve at 168 h / c: Trust c 1.5, Chapter 2 c 2, the Cartel
+# Heist and Chapter 3 c about 6 (38 holders at the snapshot against Chapter 2's
+# 1,955), and the missions after it further down the steep early part of the
+# curve, where a wide spread is the honest answer: nobody but about 16
+# early-copy players had finished any of them at the snapshot.
+# Side trophies: the ones earned inside missions keep their ratio to Chapter 2
+# (bowling 0.7, the UFO scene 0.4, the 4-star escape 0.18); cumulative ones
+# (100 vehicles, $100,000 spent) rise with hours played like Chapter 2; early
+# optional ones (fishing, an arcade game, the tank, the airport) rise slowly
+# along their own measured trend; side-strand finales and heists that only
+# open late sit near the late story; completion grinds (250 stunts, 100 photo
+# spots, every meditation spot, 100 %) stay on the 0.01 floor.
 PRIOR = {
     # platinum and 100 %
-    "vicegotaprice": (0.01, 0.01, 0.9),
-    "alongroad": (0.01, 0.01, 0.9),
+    "vicegotaprice": (0.01, 0.01, 0.8),
+    "alongroad": (0.01, 0.01, 0.8),
     # story chain
     "justlikeparadise": (100.0, 100.0, 0.0),
-    "paradiselost": (11.98, 45.0, 0.85),
-    "trust": (4.26, 32.0, 0.95),
-    "tsassdrugmoney": (1.71, 19.0, 1.0),
-    "breakthebank": (0.03, 8.0, 1.25),
-    "vicecitybaby": (0.03, 7.0, 1.25),
-    "familymatters": (0.02, 4.4, 1.3),
-    "dwnfall": (0.02, 3.5, 1.3),
-    "topoftheworldma": (0.02, 3.0, 1.3),
-    "hijacked": (0.02, 2.5, 1.35),
-    "snowstorm": (0.02, 1.9, 1.35),
-    "yougottaknowwhentogetoff": (0.02, 1.6, 1.35),
+    "paradiselost": (18.02, 47.0, 0.55),
+    "trust": (7.98, 35.0, 0.7),
+    "tsassdrugmoney": (3.61, 27.0, 0.75),
+    "breakthebank": (0.07, 6.0, 1.15),
+    "vicecitybaby": (0.07, 5.5, 1.15),
+    "familymatters": (0.03, 3.0, 1.25),
+    "dwnfall": (0.03, 2.4, 1.25),
+    "topoftheworldma": (0.03, 2.0, 1.25),
+    "hijacked": (0.03, 1.5, 1.3),
+    "snowstorm": (0.03, 1.2, 1.3),
+    "yougottaknowwhentogetoff": (0.03, 1.0, 1.3),
     # early optional and "falls out of play" trophies
-    "baitedmytackle": (13.30, 24.0, 0.7),
-    "stickfiddler": (1.42, 5.0, 0.9),
-    "whipitgood": (1.70, 14.0, 1.0),
-    "letsgobowling": (1.26, 5.0, 0.95),
-    "thetruthisoutthere": (0.72, 3.5, 1.0),
-    "hottogether": (0.31, 3.0, 1.05),
-    "catchmeifyoucan": (0.23, 1.5, 1.05),
-    "challengingtank": (0.20, 1.3, 1.05),
-    "inthebeginning": (0.17, 1.2, 1.05),
-    "gunslinger": (0.08, 1.2, 1.15),
-    "tenpin": (0.06, 0.5, 1.15),
-    "retailtherapy": (0.04, 0.5, 1.2),
-    "sneakthief": (0.04, 0.5, 1.2),
-    "treatyoself": (0.03, 0.6, 1.25),
-    "thegoodtimestate": (0.04, 0.2, 1.2),
-    # still on the reviewer floor at the snapshot: side strands and heists
-    "aclassicblitzplay": (0.01, 0.4, 1.35),
-    "capitaloffense": (0.01, 0.25, 1.35),
-    "badluckiguess": (0.01, 0.2, 1.35),
-    "personalbest": (0.01, 0.15, 1.35),
-    "onthespot": (0.01, 0.3, 1.35),
-    "dimeonthedollar": (0.01, 0.15, 1.35),
-    "masterofnone": (0.01, 0.15, 1.35),
-    "fairgame": (0.01, 0.3, 1.35),
-    "roadtorehabilitation": (0.01, 0.45, 1.35),
-    "thiswasnoboataccident": (0.02, 0.45, 1.35),
-    "thelonerider": (0.02, 0.45, 1.35),
-    "supplydemand": (0.01, 0.4, 1.35),
-    "spinonthis": (0.01, 0.4, 1.35),
+    "baitedmytackle": (16.73, 29.0, 0.45),
+    "stickfiddler": (1.84, 4.5, 0.6),
+    "whipitgood": (3.25, 21.0, 0.8),
+    "letsgobowling": (2.44, 16.0, 0.8),
+    "thetruthisoutthere": (1.41, 9.0, 0.85),
+    "hottogether": (0.65, 5.0, 0.9),
+    "catchmeifyoucan": (0.29, 0.8, 0.8),
+    "challengingtank": (0.24, 0.6, 0.8),
+    "inthebeginning": (0.21, 0.55, 0.8),
+    "gunslinger": (0.11, 0.5, 1.0),
+    "tenpin": (0.10, 0.5, 1.0),
+    "retailtherapy": (0.09, 0.8, 1.0),
+    "sneakthief": (0.10, 1.0, 1.0),
+    "treatyoself": (0.13, 2.5, 1.1),
+    "thegoodtimestate": (0.05, 0.25, 1.0),
+    # side strands and heists that open late
+    "thiswasnoboataccident": (0.06, 1.0, 1.2),
+    "roadtorehabilitation": (0.02, 0.35, 1.3),
+    "thelonerider": (0.02, 0.35, 1.3),
+    "supplydemand": (0.01, 0.25, 1.3),
+    "spinonthis": (0.01, 0.25, 1.3),
+    "aclassicblitzplay": (0.01, 0.3, 1.3),
+    "capitaloffense": (0.02, 0.25, 1.3),
+    "personalbest": (0.02, 0.2, 1.3),
+    "badluckiguess": (0.01, 0.15, 1.3),
+    "onthespot": (0.01, 0.25, 1.3),
+    "fairgame": (0.01, 0.2, 1.3),
+    "theshootist": (0.03, 0.2, 1.2),
+    "dimeonthedollar": (0.01, 0.12, 1.3),
+    "masterofnone": (0.01, 0.12, 1.3),
+    "actionsspeaklouder": (0.01, 0.08, 1.3),
     "littleboxes": (0.01, 0.08, 1.3),
     "maximumwithdrawal": (0.01, 0.06, 1.3),
-    "actionsspeaklouder": (0.01, 0.05, 1.3),
-    "pestcontrol": (0.01, 0.04, 1.3),
-    "strangersfreaks": (0.01, 0.05, 1.3),
-    "earncashnotkudos": (0.01, 0.05, 1.3),
-    "donttouchmydeck": (0.01, 0.05, 1.3),
-    "positivementalattitude": (0.01, 0.04, 1.3),
-    "onelastthing": (0.01, 0.02, 1.2),
-    "topfun": (0.01, 0.02, 1.2),
-    "theshootist": (0.01, 0.012, 1.1),
-    "youwainker": (0.01, 0.012, 1.1),
+    "earncashnotkudos": (0.01, 0.06, 1.3),
+    "strangersfreaks": (0.01, 0.06, 1.2),
+    "positivementalattitude": (0.01, 0.05, 1.2),
+    "pestcontrol": (0.01, 0.04, 1.2),
+    # completion grinds
+    "onelastthing": (0.01, 0.03, 1.1),
+    "donttouchmydeck": (0.01, 0.03, 1.1),
+    "topfun": (0.01, 0.03, 1.1),
+    "youwainker": (0.01, 0.015, 1.0),
     "cunningstunts": (0.01, 0.012, 1.0),
 }
 
