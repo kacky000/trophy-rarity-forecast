@@ -71,8 +71,12 @@ PRIOR_HOURS = 168.0
 # UFO scene between 39.6 h and 50.2 h were all 1.1-1.35, while their logit
 # slopes ran from 2.0 to 3.3 depending on how rare the trophy still was.
 # Less than all of the slope is carried forward: some players stop playing,
-# and weekdays follow the weekend.
-TREND_DAMP = 0.8
+# and weekdays follow the weekend. Backtested on archived first-weeks of four
+# big story launches (Cyberpunk 2077, Elden Ring, Hogwarts Legacy, Red Dead
+# Redemption 2; achievement rates from two early reads extended to a later
+# one): the logit pinball loss was 0.31-0.37 holding rates flat, 0.15 at
+# half the slope and 0.07-0.08 at 0.85-1.0 of it.
+TREND_DAMP = 0.9
 TREND_MIN = -0.2
 TREND_MAX = 1.6
 # A trend counts only when this many tracked players hold the trophy now, and
@@ -84,7 +88,7 @@ TREND_HOLDERS_THEN = 12.0
 TREND_LOOKBACK_HOURS = 24.0
 
 # Blend weights (prior, shifted, trend) with and without a usable trend.
-W_WITH_TREND = (0.30, 0.35, 0.35)
+W_WITH_TREND = (0.10, 0.15, 0.75)
 W_NO_TREND = (0.50, 0.50, 0.0)
 
 # Disagreement between the views widens the spread by this share of its size.

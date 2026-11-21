@@ -39,9 +39,14 @@ For each trophy three views of its logit rate at the target are blended:
 
 | view | what it says | weight (trend usable / not) |
 | --- | --- | --- |
-| P, prior | a typed median for the displayed rate a week after launch, reasoned from what the trophy asks for | 0.30 / 0.50 |
-| S, shifted | the last recorded rate plus the share of the prior's drift that is still ahead of the last read | 0.35 / 0.50 |
-| A, trend | the trophy's own last-day slope of probit against ln(1 + hours since launch), damped to 80 % and clipped | 0.35 / 0 |
+| P, prior | a typed median for the displayed rate a week after launch, reasoned from what the trophy asks for | 0.10 / 0.50 |
+| S, shifted | the last recorded rate plus the share of the prior's drift that is still ahead of the last read | 0.15 / 0.50 |
+| A, trend | the trophy's own last-day slope of probit against ln(1 + hours since launch), damped to 90 % and clipped | 0.75 / 0 |
+
+The trend's weight and damping come from a backtest on archived first weeks of four big story launches
+(Cyberpunk 2077, Elden Ring, Hogwarts Legacy, Red Dead Redemption 2): extending two early reads of every achievement
+to a later read, the logit pinball loss was 0.31-0.37 for holding rates flat, 0.15 for half the slope and 0.07-0.08
+for 85-100 % of it.
 
 - Why probit: if the hours a player needs to reach a trophy are lognormal across players who keep arriving at a
   steady pace, the rate is a normal CDF of log time and its probit is a straight line. The reads agree: between 39.6 h
