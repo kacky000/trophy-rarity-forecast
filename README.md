@@ -25,8 +25,8 @@ Two days after launch the page is early in a long game, and players have a weeke
   at the same hour, so the page is close to real play, not far behind it.
 - Chapter 2 climbs as steeply, in logit against log time, as Chapter 1 would have at half the hours, and "Trust"
   follows Chapter 1 at about two thirds of the clock. Reading every story trophy off Chapter 1's curve at
-  168 h / c puts Chapter 1 a little under 50 % at the target, Chapter 2 over a quarter, Chapter 3 near 5 % and the
-  final mission near 1 %.
+  168 h / c, and carrying Chapter 1 itself on along its probit line with some allowance for players who stop, puts
+  Chapter 1 near 55 % at the target, Chapter 2 near 30 %, Chapter 3 near 5 % and the final mission near 1 %.
 - Trophies earned inside story missions keep their ratio to the chapter they sit in; cumulative ones (100 vehicles,
   $100,000 spent) rise with hours played; early optional ones (fishing, an arcade game) rise slowly.
 
@@ -40,11 +40,16 @@ For each trophy three views of its logit rate at the target are blended:
 | view | what it says | weight (trend usable / not) |
 | --- | --- | --- |
 | P, prior | a typed median for the displayed rate a week after launch, reasoned from what the trophy asks for | 0.30 / 0.50 |
-| S, shifted | the last recorded rate plus the share of the prior's drift that is still ahead of the last read | 0.38 / 0.50 |
-| A, trend | the trophy's own last-day slope of logit against ln(1 + hours since launch), damped to 70 % and clipped | 0.32 / 0 |
+| S, shifted | the last recorded rate plus the share of the prior's drift that is still ahead of the last read | 0.35 / 0.50 |
+| A, trend | the trophy's own last-day slope of probit against ln(1 + hours since launch), damped to 80 % and clipped | 0.35 / 0 |
 
-- The trend is used only when at least 40 tracked players hold the trophy now and 12 did at the earlier read; below
-  that a 2-decimal page is rounding noise.
+- Why probit: if the hours a player needs to reach a trophy are lognormal across players who keep arriving at a
+  steady pace, the rate is a normal CDF of log time and its probit is a straight line. The reads agree: between 39.6 h
+  and 50.2 h the probit slopes of Chapter 1, Chapter 2, Trust, 100 vehicles, bowling and the UFO scene were all
+  1.1-1.35, while their logit slopes ran from 2.0 to 3.3 depending on how rare each still was.
+- The trend is measured over a whole day (so the hour of the day cancels) between the moments the page actually
+  changed (Exophase refreshes its counts in steps), and is used only when at least 40 tracked players hold the trophy
+  now and 12 did at the earlier read; below that a 2-decimal page is rounding noise.
 - S makes the forecast follow the page: if the recorded rates run ahead of the prior's path the median rises, and if
   the page stalls the median falls.
 - The spread is a normal on the logit scale: the trophy's prior uncertainty (0.45-0.6 for early optional trophies, 0.55-0.75
@@ -54,8 +59,10 @@ For each trophy three views of its logit rate at the target are blended:
   except the opening mission's, which has read 100.00 % in every read and is forecast to stay there.
 - Quantiles are clamped to 0.01..99.99 like the scorer's logit, so floor trophies get quantiles on the floor.
 - On launch night (fewer than 2,000 tracked players, the practice cases) the page is the pre-refresh one; the rules
-  describe the first refresh as a sixfold jump in tracked players that lowered every rate, so the forecast there is a
-  dilution of about 1.45 logits with a spread of 0.5.
+  describe the first refresh as a jump from 638 to 3,868 tracked players that lowered every rate. A rate on that page
+  is a whole number of early holders over 638, and players who started at launch cannot hold a late trophy 90 minutes
+  later, so the forecast there is the same holders over 3,868, with the top quantile one holder higher. This branch
+  only serves the practice cases; the final case never enters it.
 - A trophy the table does not know (if the list changes) gets a modest catch-up and a wide spread; any failure inside
   a case falls back to a wide band around its last rates, so the output is always valid.
 
